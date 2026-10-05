@@ -1,15 +1,79 @@
 import 'package:flutter/material.dart';
 
+// Identitas Mahasiswa
 const String studentName = 'I Komang Candra Aryadinata';
 const String studentId = '2415051085';
+
+// Model Course
+class Course {
+  final String id;
+  final String title;
+  final String code;
+  final String status;
+  final String description;
+  bool isFavorite;
+
+  Course({
+    required this.id,
+    required this.title,
+    required this.code,
+    required this.status,
+    required this.description,
+    this.isFavorite = false,
+  });
+}
+
+// Data Course Statik (Minimal 5 item)
+final List<Course> dummyCourses = [
+  Course(
+    id: '1',
+    title: 'Responsive Layout',
+    code: 'MOB04',
+    status: 'Active',
+    description: 'Mempelajari pembuatan layout adaptif menggunakan LayoutBuilder & MediaQuery.',
+  ),
+  Course(
+    id: '2',
+    title: 'Navigation',
+    code: 'MOB05',
+    status: 'Planned',
+    description: 'Mempelajari navigasi multi-screen, Navigator.push, pop, dan passing data.',
+  ),
+  Course(
+    id: '3',
+    title: 'Interaction',
+    code: 'MOB06',
+    status: 'Planned',
+    description: 'Mempelajari penanganan gestur user menggunakan InkWell dan GestureDetector.',
+  ),
+  Course(
+    id: '4',
+    title: 'Form & Input',
+    code: 'MOB07',
+    status: 'Upcoming',
+    description:
+        'Mempelajari pembuatan form, input validation, dan controller.',
+  ),
+  Course(
+    id: '5',
+    title: 'State Management',
+    code: 'MOB08',
+    status: 'Upcoming',
+    description:
+        'Mempelajari pengelolaan state aplikasi secara responsif dan efisien.',
+  ),
+  Course(
+    id: '6',
+    title: 'API Integration',
+    code: 'MOB09',
+    status: 'Upcoming',
+    description: 'Mempelajari konsumsi REST API dan pemrosesan JSON.',
+  ),
+];
 
 void main() {
   runApp(const CourseExplorerApp());
 }
-
-// =====================================================
-// APP
-// =====================================================
 
 class CourseExplorerApp extends StatelessWidget {
   const CourseExplorerApp({super.key});
@@ -20,327 +84,335 @@ class CourseExplorerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Course Explorer',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
       ),
-      home: const MainNavigationPage(),
+      home: const ResponsiveShell(),
     );
   }
 }
 
-// =====================================================
-// MAIN NAVIGATION
-// =====================================================
-
-class MainNavigationPage extends StatefulWidget {
-  const MainNavigationPage({super.key});
+// Shell Utama Adaptif
+class ResponsiveShell extends StatefulWidget {
+  const ResponsiveShell({super.key});
 
   @override
-  State<MainNavigationPage> createState() => _MainNavigationPageState();
+  State<ResponsiveShell> createState() => _ResponsiveShellState();
 }
 
-class _MainNavigationPageState extends State<MainNavigationPage> {
-  int selectedIndex = 0;
+class _ResponsiveShellState extends State<ResponsiveShell> {
+  int _selectedIndex = 0;
 
-  final List<Widget> pages = const [HomeTab(), CoursesTab(), ProfileTab()];
-
-  void changePage(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
+  final List<Widget> _pages = const [HomePage(), CoursesPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final bool isExpanded = constraints.maxWidth >= 840;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isExpanded = constraints.maxWidth >= 840;
 
-          if (isExpanded) {
-            return Row(
-              children: [
-                NavigationRail(
-                  selectedIndex: selectedIndex,
-                  onDestinationSelected: changePage,
-                  labelType: NavigationRailLabelType.all,
-                  destinations: const [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home_outlined),
-                      selectedIcon: Icon(Icons.home),
-                      label: Text('Home'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.menu_book_outlined),
-                      selectedIcon: Icon(Icons.menu_book),
-                      label: Text('Courses'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.person_outline),
-                      selectedIcon: Icon(Icons.person),
-                      label: Text('Profile'),
-                    ),
-                  ],
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Course Explorer',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(20.0),
+              child: Container(
+                color: Colors.blue.shade700,
+                width: double.infinity,
+                padding: const EdgeInsets.only(bottom: 4.0, left: 16.0),
+                child: Text(
+                  '$studentId - $studentName',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
-                const VerticalDivider(width: 1),
-                Expanded(child: pages[selectedIndex]),
-              ],
-            );
-          }
-
-          return pages[selectedIndex];
-        },
-      ),
-
-      // NavigationBar untuk layar Compact/Medium
-      bottomNavigationBar: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth >= 840) {
-            return const SizedBox.shrink();
-          }
-
-          return NavigationBar(
-            selectedIndex: selectedIndex,
-            onDestinationSelected: changePage,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: 'Home',
               ),
-              NavigationDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book),
-                label: 'Courses',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-// =====================================================
-// HOME
-// =====================================================
-
-class HomeTab extends StatelessWidget {
-  const HomeTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Course Explorer')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-
-                const Icon(Icons.school, size: 80),
-
-                const SizedBox(height: 20),
-
-                const Text(
-                  'Selamat Datang',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-
-                const SizedBox(height: 12),
-
-                const Text(
-                  studentName,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18),
-                ),
-
-                const SizedBox(height: 8),
-
-                const Text('NIM: 2415051085', style: TextStyle(fontSize: 16)),
-
-                const SizedBox(height: 30),
-
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: const [
-                        Icon(Icons.menu_book, size: 50),
-                        SizedBox(height: 12),
-                        Text(
-                          'Course Explorer',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+            ),
+          ),
+          body: isExpanded
+              ? Row(
+                  children: [
+                    NavigationRail(
+                      selectedIndex: _selectedIndex,
+                      onDestinationSelected: (idx) =>
+                          setState(() => _selectedIndex = idx),
+                      labelType: NavigationRailLabelType.all,
+                      destinations: const [
+                        NavigationRailDestination(
+                          icon: Icon(Icons.home),
+                          label: Text('Home'),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Aplikasi untuk menjelajahi '
-                          'informasi mata kuliah.',
-                          textAlign: TextAlign.center,
+                        NavigationRailDestination(
+                          icon: Icon(Icons.menu_book),
+                          label: Text('Courses'),
+                        ),
+                        NavigationRailDestination(
+                          icon: Icon(Icons.person),
+                          label: Text('Profile'),
                         ),
                       ],
                     ),
-                  ),
+                    const VerticalDivider(thickness: 1, width: 1),
+                    Expanded(child: _pages[_selectedIndex]),
+                  ],
+                )
+              : _pages[_selectedIndex],
+          bottomNavigationBar: isExpanded
+              ? null
+              : NavigationBar(
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (idx) =>
+                      setState(() => _selectedIndex = idx),
+                  destinations: const [
+                    NavigationDestination(
+                      icon: Icon(Icons.home),
+                      label: 'Home',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.menu_book),
+                      label: 'Courses',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.person),
+                      label: 'Profile',
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-// =====================================================
-// COURSES
-// =====================================================
-
-class CoursesTab extends StatelessWidget {
-  const CoursesTab({super.key});
-
-  static const List<Map<String, dynamic>> courses = [
-    {
-      'title': 'Flutter Dasar',
-      'code': 'FL001',
-      'credits': 3,
-      'status': 'Aktif',
-    },
-    {
-      'title': 'Pemrograman Dart',
-      'code': 'DT001',
-      'credits': 3,
-      'status': 'Aktif',
-    },
-    {'title': 'UI/UX Design', 'code': 'UX001', 'credits': 2, 'status': 'Aktif'},
-    {'title': 'Basis Data', 'code': 'DB001', 'credits': 3, 'status': 'Aktif'},
-    {
-      'title': 'Jaringan Komputer',
-      'code': 'JK001',
-      'credits': 3,
-      'status': 'Aktif',
-    },
-  ];
-
-  Future<void> openCourse(
-    BuildContext context,
-    Map<String, dynamic> course,
-  ) async {
-    final bool? result = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return CourseDetailPage(course: course);
-        },
-      ),
-    );
-
-    if (result == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${course['title']} ditambahkan ke favorite')),
-      );
-    }
-  }
+// -----------------------------------------------------------------------------
+// 1. HOME PAGE (Tampilan Awal)
+// -----------------------------------------------------------------------------
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Courses')),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          int crossAxisCount = 1;
-
-          if (constraints.maxWidth >= 840) {
-            crossAxisCount = 3;
-          } else if (constraints.maxWidth >= 600) {
-            crossAxisCount = 2;
-          }
-
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.5,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            color: Colors.blue.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Selamat Datang, $studentName!',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('NIM: $studentId'),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Jelajahi modul pembelajaran interactive mobile development pada tab Courses.',
+                  ),
+                ],
+              ),
             ),
-            itemCount: courses.length,
-            itemBuilder: (context, index) {
-              final course = courses[index];
-
-              return CourseCard(
-                course: course,
-                onTap: () {
-                  openCourse(context, course);
-                },
-              );
-            },
-          );
-        },
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Ringkasan Kursus',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            leading: const Icon(Icons.class_, color: Colors.blue),
+            title: const Text('Total Course Available'),
+            trailing: Text('${dummyCourses.length} Courses'),
+          ),
+        ],
       ),
     );
   }
 }
 
-// =====================================================
-// COURSE CARD
-// =====================================================
+// -----------------------------------------------------------------------------
+// 2. COURSES PAGE (Course Explore + Pencari)
+// -----------------------------------------------------------------------------
+class CoursesPage extends StatefulWidget {
+  const CoursesPage({super.key});
 
+  @override
+  State<CoursesPage> createState() => _CoursesPageState();
+}
+
+class _CoursesPageState extends State<CoursesPage> {
+  String _searchQuery = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final filteredCourses = dummyCourses
+        .where(
+          (c) =>
+              c.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              c.code.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
+        .toList();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = 1;
+        if (constraints.maxWidth >= 840) {
+          crossAxisCount = 3;
+        } else if (constraints.maxWidth >= 600) {
+          crossAxisCount = 2;
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Search Bar Fitur Pencari
+              TextField(
+                onChanged: (value) => setState(() => _searchQuery = value),
+                decoration: InputDecoration(
+                  hintText: 'Search courses...',
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.blue.shade50.withOpacity(0.5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // List / Grid Adaptif
+              Expanded(
+                child: filteredCourses.isEmpty
+                    ? const Center(child: Text('Course tidak ditemukan'))
+                    : GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          childAspectRatio: 2.5,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: filteredCourses.length,
+                        itemBuilder: (context, index) {
+                          final course = filteredCourses[index];
+                          // REUSABLE WIDGET 1: CourseCard
+                          return CourseCard(
+                            course: course,
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CourseDetailPage(course: course),
+                                ),
+                              );
+                              if (result != null) {
+                                setState(() {});
+                              }
+                            },
+                            onFavoriteToggle: () {
+                              setState(() {
+                                course.isFavorite = !course.isFavorite;
+                              });
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// REUSABLE WIDGET 1: CourseCard
+// -----------------------------------------------------------------------------
 class CourseCard extends StatelessWidget {
-  final Map<String, dynamic> course;
+  final Course course;
   final VoidCallback onTap;
+  final VoidCallback onFavoriteToggle;
 
-  const CourseCard({super.key, required this.course, required this.onTap});
+  const CourseCard({
+    super.key,
+    required this.course,
+    required this.onTap,
+    required this.onFavoriteToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      clipBehavior: Clip.antiAlias,
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.blue.shade100),
+      ),
       child: InkWell(
+        borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.menu_book, size: 35),
-
-              const SizedBox(height: 10),
-
-              Text(
-                course['title'],
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      course.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF0D253F),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      course.code,
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 6),
-
-              Text(
-                '${course['code']} • '
-                '${course['credits']} SKS',
-              ),
-
-              const Spacer(),
-
               Row(
                 children: [
-                  const Icon(Icons.circle, size: 10),
-                  const SizedBox(width: 6),
-                  Text(course['status']),
+                  Text(
+                    course.status,
+                    style: TextStyle(
+                      color: course.status == 'Active'
+                          ? Colors.teal
+                          : Colors.teal.shade700,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      course.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: course.isFavorite ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: onFavoriteToggle,
+                  ),
                 ],
               ),
             ],
@@ -351,267 +423,11 @@ class CourseCard extends StatelessWidget {
   }
 }
 
-// =====================================================
-// PROFILE
-// =====================================================
-
-class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const CircleAvatar(
-                radius: 45,
-                child: Icon(Icons.person, size: 50),
-              ),
-
-              const SizedBox(height: 15),
-
-              const Text(
-                studentName,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 5),
-
-              const Text('NIM: 2415051085', style: TextStyle(fontSize: 16)),
-
-              const SizedBox(height: 30),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Feedback',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              const FeedbackForm(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// =====================================================
-// FEEDBACK FORM
-// =====================================================
-
-class FeedbackForm extends StatefulWidget {
-  const FeedbackForm({super.key});
-
-  @override
-  State<FeedbackForm> createState() => _FeedbackFormState();
-}
-
-class _FeedbackFormState extends State<FeedbackForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  final TextEditingController _nameController = TextEditingController();
-
-  final TextEditingController _nimController = TextEditingController();
-
-  final TextEditingController _commentController = TextEditingController();
-
-  bool isLoading = false;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _nimController.dispose();
-    _commentController.dispose();
-    super.dispose();
-  }
-
-  // ===================================================
-  // VALIDATE + SUBMIT
-  // ===================================================
-
-  Future<void> submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      isLoading = true;
-    });
-
-    // Simulasi proses pengiriman
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      isLoading = false;
-    });
-
-    // SnackBar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Feedback berhasil dikirim!'),
-        duration: Duration(seconds: 3),
-      ),
-    );
-
-    _commentController.clear();
-  }
-
-  // ===================================================
-  // ALERT DIALOG
-  // ===================================================
-
-  void showConfirmationDialog() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Konfirmasi'),
-          content: const Text(
-            'Apakah Anda yakin ingin '
-            'mengirim feedback?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                submitForm();
-              },
-              child: const Text('Kirim'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // NAMA
-          TextFormField(
-            controller: _nameController,
-            textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Nama',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.person),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Nama tidak boleh kosong';
-              }
-
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 15),
-
-          // NIM
-          TextFormField(
-            controller: _nimController,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'NIM',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.badge),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'NIM tidak boleh kosong';
-              }
-
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 15),
-
-          // KOMENTAR
-          TextFormField(
-            controller: _commentController,
-            maxLines: 4,
-            textInputAction: TextInputAction.newline,
-            decoration: const InputDecoration(
-              labelText: 'Komentar',
-              hintText: 'Tulis komentar minimal 5 karakter',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.comment),
-              alignLabelWithHint: true,
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Komentar tidak boleh kosong';
-              }
-
-              if (value.trim().length < 5) {
-                return 'Komentar minimal 5 karakter';
-              }
-
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 20),
-
-          // BUTTON
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton.icon(
-              onPressed: isLoading ? null : showConfirmationDialog,
-              icon: isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.send),
-              label: Text(isLoading ? 'Mengirim...' : 'Kirim Feedback'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// =====================================================
-// COURSE DETAIL
-// =====================================================
-
+// -----------------------------------------------------------------------------
+// DETAIL PAGE (Passing Data Via Constructor)
+// -----------------------------------------------------------------------------
 class CourseDetailPage extends StatefulWidget {
-  final Map<String, dynamic> course;
-
+  final Course course;
   const CourseDetailPage({super.key, required this.course});
 
   @override
@@ -619,203 +435,194 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> {
-  bool isFavorite = false;
-
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> course = widget.course;
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Course')),
-
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Icon(Icons.menu_book, size: 80),
-
-              const SizedBox(height: 20),
-
-              Text(
-                course['title'],
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // COURSE INFORMATION
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.code),
-                        title: const Text('Kode'),
-                        subtitle: Text(course['code']),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.credit_card),
-                        title: const Text('SKS'),
-                        subtitle: Text('${course['credits']} SKS'),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.check_circle),
-                        title: const Text('Status'),
-                        subtitle: Text(course['status']),
-                      ),
-                    ],
+      appBar: AppBar(title: Text(widget.course.title)),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.course.title,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Kode: ${widget.course.code} | Status: ${widget.course.status}',
+            ),
+            const Divider(height: 32),
+            Text(
+              widget.course.description,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // IDENTITY
-              const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Data Mahasiswa',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(studentName),
-                      Text('NIM: 2415051085'),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // FAVORITE BUTTON
-              ElevatedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    isFavorite = !isFavorite;
-                  });
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        isFavorite
-                            ? 'Course ditambahkan ke favorite'
-                            : 'Course dihapus dari favorite',
-                      ),
-                    ),
-                  );
-                },
-                icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-                label: Text(isFavorite ? 'Favorite' : 'Tambah Favorite'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // INKWELL
-              Material(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {
+                  onPressed: () {
+                    setState(() {
+                      widget.course.isFavorite = !widget.course.isFavorite;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Course dipilih menggunakan InkWell'),
+                      SnackBar(
+                        content: Text(
+                          widget.course.isFavorite
+                              ? 'Ditambahkan ke favorit oleh $studentName'
+                              : 'Dihapus dari favorit',
+                        ),
                       ),
                     );
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.all(18),
-                    child: Center(
-                      child: Text(
-                        'Tekan area ini',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                  icon: Icon(
+                    widget.course.isFavorite
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                  ),
+                  label: Text(
+                    widget.course.isFavorite ? 'Favorit' : 'Tambah Favorit',
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // GESTURE DETECTOR
-              GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('GestureDetector: Tap terdeteksi'),
-                    ),
-                  );
-                },
-                onLongPress: () {
-                  showDialog<void>(
-                    context: context,
-                    builder: (dialogContext) {
-                      return AlertDialog(
-                        title: const Text('Long Press'),
-                        content: const Text(
-                          'Anda menekan area ini '
-                          'cukup lama.',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(dialogContext);
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(Icons.touch_app),
-                      SizedBox(height: 8),
-                      Text(
-                        'Tap atau Long Press',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // BACK
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context, isFavorite);
-                },
-                child: const Text('Kembali'),
-              ),
-            ],
-          ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'Pengembang: $studentName ($studentId)',
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 3. PROFILE PAGE (Form Feedback & Validasi)
+// -----------------------------------------------------------------------------
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+              title: Text(
+                studentName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('NIM: $studentId'),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Form Feedback',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          // REUSABLE WIDGET 2: FeedbackFormWidget
+          const FeedbackFormWidget(),
+        ],
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// REUSABLE WIDGET 2: FeedbackFormWidget
+// -----------------------------------------------------------------------------
+class FeedbackFormWidget extends StatefulWidget {
+  const FeedbackFormWidget({super.key});
+
+  @override
+  State<FeedbackFormWidget> createState() => _FeedbackFormWidgetState();
+}
+
+class _FeedbackFormWidgetState extends State<FeedbackFormWidget> {
+  final _formKey = GlobalKey<FormState>();
+  final _commentController = TextEditingController();
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Konfirmasi Feedback'),
+          content: Text(
+            'Kirim feedback dari $studentName ($studentId)?\n\nIsi: "${_commentController.text}"',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _commentController.clear();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Feedback berhasil dikirim! Terima kasih.'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: const Text('Kirim'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _commentController,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              labelText: 'Komentar / Feedback',
+              border: OutlineInputBorder(),
+              hintText: 'Tuliskan masukan Anda (minimal 5 karakter)...',
+            ),
+            validator: (value) {
+              if (value == null || value.trim().length < 5) {
+                return 'Komentar harus berisi minimal 5 karakter!';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: _submitForm,
+              child: const Text('Kirim Feedback'),
+            ),
+          ),
+        ],
       ),
     );
   }
