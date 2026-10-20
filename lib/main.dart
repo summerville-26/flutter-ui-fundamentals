@@ -1,4 +1,3 @@
-//I Komang Candra Aryadinata || 2415051085
 import 'package:flutter/material.dart';
 
 // Identitas Mahasiswa
@@ -24,7 +23,7 @@ class Course {
   });
 }
 
-// Data Course Statik (Minimal 5 item)
+// Data Course Statik
 final List<Course> dummyCourses = [
   Course(
     id: '1',
@@ -122,11 +121,11 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(20.0),
+              preferredSize: const Size.fromHeight(20),
               child: Container(
                 color: Colors.blue.shade700,
                 width: double.infinity,
-                padding: const EdgeInsets.only(bottom: 4.0, left: 16.0),
+                padding: const EdgeInsets.only(bottom: 4, left: 16),
                 child: Text(
                   '$studentId - $studentName',
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
@@ -139,8 +138,9 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                   children: [
                     NavigationRail(
                       selectedIndex: _selectedIndex,
-                      onDestinationSelected: (idx) =>
-                          setState(() => _selectedIndex = idx),
+                      onDestinationSelected: (idx) {
+                        setState(() => _selectedIndex = idx);
+                      },
                       labelType: NavigationRailLabelType.all,
                       destinations: const [
                         NavigationRailDestination(
@@ -166,8 +166,9 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
               ? null
               : NavigationBar(
                   selectedIndex: _selectedIndex,
-                  onDestinationSelected: (idx) =>
-                      setState(() => _selectedIndex = idx),
+                  onDestinationSelected: (idx) {
+                    setState(() => _selectedIndex = idx);
+                  },
                   destinations: const [
                     NavigationDestination(
                       icon: Icon(Icons.home),
@@ -190,7 +191,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
 }
 
 // -----------------------------------------------------------------------------
-// 1. HOME PAGE (Tampilan Awal)
+// HOME PAGE
 // -----------------------------------------------------------------------------
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -198,14 +199,14 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Card(
             color: Colors.blue.shade50,
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -245,7 +246,7 @@ class HomePage extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 2. COURSES PAGE (Course Explore + Pencari)
+// COURSES PAGE
 // -----------------------------------------------------------------------------
 class CoursesPage extends StatefulWidget {
   const CoursesPage({super.key});
@@ -257,13 +258,22 @@ class CoursesPage extends StatefulWidget {
 class _CoursesPageState extends State<CoursesPage> {
   String _searchQuery = '';
 
-  // Tahap 3: parent menjadi single source of truth untuk status favorit.
+  // Tahap 3: Single source of truth pada parent.
   bool _demoFavorite = false;
+  // I Komang Candra Aryadinata || 2415051085
+  // Tahap 4: ValueNotifier untuk satu nilai sederhana.
+  final ValueNotifier<int> _favoriteCounter = ValueNotifier<int>(0);
 
   void _toggleDemoFavorite() {
     setState(() {
       _demoFavorite = !_demoFavorite;
     });
+  }
+
+  @override
+  void dispose() {
+    _favoriteCounter.dispose();
+    super.dispose();
   }
 
   @override
@@ -279,6 +289,7 @@ class _CoursesPageState extends State<CoursesPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         int crossAxisCount = 1;
+
         if (constraints.maxWidth >= 840) {
           crossAxisCount = 3;
         } else if (constraints.maxWidth >= 600) {
@@ -286,12 +297,13 @@ class _CoursesPageState extends State<CoursesPage> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Search Bar Fitur Pencari
               TextField(
-                onChanged: (value) => setState(() => _searchQuery = value),
+                onChanged: (value) {
+                  setState(() => _searchQuery = value);
+                },
                 decoration: InputDecoration(
                   hintText: 'Search courses...',
                   prefixIcon: const Icon(Icons.search),
@@ -305,7 +317,7 @@ class _CoursesPageState extends State<CoursesPage> {
               ),
               const SizedBox(height: 12),
 
-              // Tahap 3: satu state di parent menjadi acuan untuk kedua child.
+              // Tahap 3: State parent dibagikan kepada dua child.
               Row(
                 children: [
                   Expanded(
@@ -320,9 +332,46 @@ class _CoursesPageState extends State<CoursesPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // List / Grid Adaptif
+              // Tahap 4: ValueNotifier dan ValueListenableBuilder.
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Tahap 4: ValueNotifier',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ValueListenableBuilder<int>(
+                        valueListenable: _favoriteCounter,
+                        builder: (context, value, child) {
+                          return Text(
+                            'Jumlah: $value',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        tooltip: 'Tambah jumlah',
+                        onPressed: () {
+                          _favoriteCounter.value++;
+                        },
+                        icon: const Icon(Icons.add_circle_outline),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Daftar course responsif.
               Expanded(
                 child: filteredCourses.isEmpty
                     ? const Center(child: Text('Course tidak ditemukan'))
@@ -336,7 +385,7 @@ class _CoursesPageState extends State<CoursesPage> {
                         itemCount: filteredCourses.length,
                         itemBuilder: (context, index) {
                           final course = filteredCourses[index];
-                          // REUSABLE WIDGET 1: CourseCard
+
                           return CourseCard(
                             course: course,
                             onTap: () async {
@@ -347,7 +396,8 @@ class _CoursesPageState extends State<CoursesPage> {
                                       CourseDetailPage(course: course),
                                 ),
                               );
-                              if (result != null) {
+
+                              if (result != null && mounted) {
                                 setState(() {});
                               }
                             },
@@ -369,9 +419,7 @@ class _CoursesPageState extends State<CoursesPage> {
 }
 
 // -----------------------------------------------------------------------------
-// TAHAP 3: Parent menyimpan satu state; child menerima data melalui constructor.
-// Hanya child kontrol yang mengirim aksi melalui callback. Child status hanya
-// menampilkan nilai dari parent sehingga tidak memiliki salinan state sendiri.
+// CHILD TAHAP 3
 // -----------------------------------------------------------------------------
 class FavoriteToggleChild extends StatelessWidget {
   final bool isFavorite;
@@ -439,7 +487,7 @@ class FavoriteStatusChild extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// REUSABLE WIDGET 1: CourseCard
+// COURSE CARD
 // -----------------------------------------------------------------------------
 class CourseCard extends StatelessWidget {
   final Course course;
@@ -465,7 +513,7 @@ class CourseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -522,10 +570,11 @@ class CourseCard extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// DETAIL PAGE (Passing Data Via Constructor)
+// DETAIL PAGE
 // -----------------------------------------------------------------------------
 class CourseDetailPage extends StatefulWidget {
   final Course course;
+
   const CourseDetailPage({super.key, required this.course});
 
   @override
@@ -533,7 +582,7 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> {
-  // Tahap 1: local state untuk menampilkan/menyembunyikan deskripsi.
+  // Tahap 1: local state untuk deskripsi.
   bool _showDescription = true;
 
   @override
@@ -541,7 +590,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.course.title)),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -591,6 +640,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                     setState(() {
                       widget.course.isFavorite = !widget.course.isFavorite;
                     });
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -625,7 +675,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 }
 
 // -----------------------------------------------------------------------------
-// 3. PROFILE PAGE (Form Feedback & Validasi)
+// PROFILE PAGE
 // -----------------------------------------------------------------------------
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -633,7 +683,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -656,7 +706,6 @@ class ProfilePage extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          // REUSABLE WIDGET 2: FeedbackFormWidget
           const FeedbackFormWidget(),
         ],
       ),
@@ -665,7 +714,7 @@ class ProfilePage extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// REUSABLE WIDGET 2: FeedbackFormWidget
+// FEEDBACK FORM
 // -----------------------------------------------------------------------------
 class FeedbackFormWidget extends StatefulWidget {
   const FeedbackFormWidget({super.key});
@@ -685,7 +734,8 @@ class _FeedbackFormWidgetState extends State<FeedbackFormWidget> {
         builder: (context) => AlertDialog(
           title: const Text('Konfirmasi Feedback'),
           content: Text(
-            'Kirim feedback dari $studentName ($studentId)?\n\nIsi: "${_commentController.text}"',
+            'Kirim feedback dari $studentName ($studentId)?\n\n'
+            'Isi: "${_commentController.text}"',
           ),
           actions: [
             TextButton(
@@ -696,6 +746,7 @@ class _FeedbackFormWidgetState extends State<FeedbackFormWidget> {
               onPressed: () {
                 Navigator.pop(context);
                 _commentController.clear();
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Feedback berhasil dikirim! Terima kasih.'),
@@ -709,6 +760,12 @@ class _FeedbackFormWidgetState extends State<FeedbackFormWidget> {
         ),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
   @override
