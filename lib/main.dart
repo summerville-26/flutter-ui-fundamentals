@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'course_state.dart';
 
 // Identitas Mahasiswa
 const String studentName = 'I Komang Candra Aryadinata';
@@ -70,9 +73,14 @@ final List<Course> dummyCourses = [
     description: 'Mempelajari konsumsi REST API dan pemrosesan JSON.',
   ),
 ];
-
+//I Komang Candra Aryadinata || 2415051085
 void main() {
-  runApp(const CourseExplorerApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CourseState(),
+      child: const CourseExplorerApp(),
+    ),
+  );
 }
 
 class CourseExplorerApp extends StatelessWidget {
@@ -308,7 +316,7 @@ class _CoursesPageState extends State<CoursesPage> {
                   hintText: 'Search courses...',
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
-                  fillColor: Colors.blue.shade50.withOpacity(0.5),
+                  fillColor: Colors.blue.withValues(alpha: 0.1),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
