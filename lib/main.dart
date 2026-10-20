@@ -7,7 +7,6 @@ import 'pages/courses_page.dart';
 import 'pages/profile_page.dart';
 import 'providers/course_provider.dart';
 
-// I Komang Candra Aryadinata || 2415051085
 const String studentName = 'I Komang Candra Aryadinata';
 const String studentId = '2415051085';
 
