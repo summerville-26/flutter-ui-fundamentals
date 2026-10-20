@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/course.dart';
 import 'course_state.dart';
 
 // I Komang Candra Aryadinata || 2415051085
@@ -8,21 +9,6 @@ const String studentName = 'I Komang Candra Aryadinata';
 const String studentId = '2415051085';
 
 // MODEL COURSE
-class Course {
-  final String id;
-  final String title;
-  final String code;
-  final String status;
-  final String description;
-
-  Course({
-    required this.id,
-    required this.title,
-    required this.code,
-    required this.status,
-    required this.description,
-  });
-}
 
 // DATA COURSE STATIK
 final List<Course> dummyCourses = [
