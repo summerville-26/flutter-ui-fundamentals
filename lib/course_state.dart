@@ -15,7 +15,7 @@ class CourseState extends ChangeNotifier {
       favorites.add(id);
     }
 
-    notifyListeners();
+    // notifyListeners(); // Dinonaktifkan sementara
   }
 
   int get favoriteCount => favorites.length;

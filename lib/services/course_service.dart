@@ -3,6 +3,13 @@ import '../models/course.dart';
 // I Komang Candra Aryadinata || 2415051085
 class CourseService {
   Future<List<Course>> fetchCourses() async {
+    await Future.delayed(const Duration(seconds: 1));
+
+    throw Exception('Simulasi kegagalan memuat data');
+
+    // Kode data simulasi yang lama tetap disimpan
+    // untuk dikembalikan setelah percobaan.
+
     // Simulasi pengambilan data JSON
     final List<Map<String, dynamic>> jsonData = [
       {
