@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../course_state.dart';
-import '../data/course_data.dart';
 import '../models/course.dart';
+import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
 import '../widgets/favorite_widgets.dart';
 import 'course_detail_page.dart';
@@ -22,6 +22,17 @@ class _CoursesPageState extends State<CoursesPage> {
 
   final ValueNotifier<int> _favoriteCounter = ValueNotifier<int>(0);
 
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<CourseProvider>().loadCourses();
+      }
+    });
+  }
+
   void _toggleDemoFavorite() {
     setState(() {
       _demoFavorite = !_demoFavorite;
@@ -37,8 +48,9 @@ class _CoursesPageState extends State<CoursesPage> {
   @override
   Widget build(BuildContext context) {
     final courseState = context.watch<CourseState>();
+    final courseProvider = context.watch<CourseProvider>();
 
-    final filteredCourses = dummyCourses.where((course) {
+    final filteredCourses = courseProvider.courses.where((course) {
       final query = _searchQuery.toLowerCase();
 
       return course.title.toLowerCase().contains(query) ||
@@ -93,51 +105,14 @@ class _CoursesPageState extends State<CoursesPage> {
               ),
               const SizedBox(height: 12),
 
-              // Tahap 4: ValueNotifier
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Tahap 4: ValueNotifier',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ValueListenableBuilder<int>(
-                        valueListenable: _favoriteCounter,
-                        builder: (context, value, child) {
-                          return Text(
-                            'Jumlah: $value',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        tooltip: 'Tambah jumlah',
-                        onPressed: () {
-                          _favoriteCounter.value++;
-                        },
-                        icon: const Icon(Icons.add_circle_outline),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Tahap 7 dan 13: Shared Favorites dengan Provider
+              // Shared Favorites
               Card(
                 color: Colors.blue.shade50,
                 child: ListTile(
                   leading: const Icon(Icons.favorite, color: Colors.blue),
-                  title: const Text('Tahap 7: Provider Favorites'),
+                  title: const Text('Shared Favorites'),
                   subtitle: const Text(
-                    'Status favorit dibagikan ke halaman daftar dan detail.',
+                    'Favorit dibagikan ke halaman daftar dan detail.',
                   ),
                   trailing: Text(
                     '${courseState.favorites.length}',
@@ -151,7 +126,6 @@ class _CoursesPageState extends State<CoursesPage> {
               ),
               const SizedBox(height: 8),
 
-              // Contoh Consumer
               Consumer<CourseState>(
                 builder: (context, state, child) {
                   return Card(
@@ -162,7 +136,7 @@ class _CoursesPageState extends State<CoursesPage> {
                       ),
                       title: const Text('Consumer: Jumlah Favorit'),
                       trailing: Text(
-                        '${state.favorites.length}',
+                        '${state.favoriteCount}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -175,52 +149,105 @@ class _CoursesPageState extends State<CoursesPage> {
               ),
               const SizedBox(height: 12),
 
-              // Daftar mata kuliah
+              // Loading, error, dan success state
               Expanded(
-                child: filteredCourses.isEmpty
-                    ? const Center(child: Text('Course tidak ditemukan'))
-                    : GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: 2.5,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                        itemCount: filteredCourses.length,
-                        itemBuilder: (context, index) {
-                          final Course course = filteredCourses[index];
-
-                          // Membaca status favorit dari shared state
-                          final isFavorite = courseState.favorites.contains(
-                            course.id,
-                          );
-
-                          return CourseCard(
-                            course: course,
-                            isFavorite: isFavorite,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      CourseDetailPage(course: course),
-                                ),
-                              );
-                            },
-                            onFavoriteToggle: () {
-                              // Memperbarui state yang sama untuk semua screen
-                              context.read<CourseState>().toggleFavorite(
-                                course.id,
-                              );
-                            },
-                          );
-                        },
-                      ),
+                child: _buildCourseContent(
+                  courseProvider,
+                  filteredCourses,
+                  crossAxisCount,
+                  courseState,
+                ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCourseContent(
+    CourseProvider provider,
+    List<Course> courses,
+    int crossAxisCount,
+    CourseState courseState,
+  ) {
+    if (provider.isLoading && provider.courses.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: Colors.blue),
+            SizedBox(height: 12),
+            Text('Memuat data mata kuliah...'),
+          ],
+        ),
+      );
+    }
+
+    if (provider.hasError && provider.courses.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 48),
+            const SizedBox(height: 8),
+            Text(
+              provider.errorMessage ?? 'Terjadi kesalahan.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () {
+                context.read<CourseProvider>().loadCourses();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Coba Lagi'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (courses.isEmpty) {
+      return const Center(child: Text('Course tidak ditemukan'));
+    }
+
+    return Column(
+      children: [
+        if (provider.isLoading)
+          const LinearProgressIndicator(color: Colors.blue),
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: 2.5,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: courses.length,
+            itemBuilder: (context, index) {
+              final course = courses[index];
+              final isFavorite = courseState.favorites.contains(course.id);
+
+              return CourseCard(
+                course: course,
+                isFavorite: isFavorite,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CourseDetailPage(course: course),
+                    ),
+                  );
+                },
+                onFavoriteToggle: () {
+                  context.read<CourseState>().toggleFavorite(course.id);
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

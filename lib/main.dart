@@ -5,6 +5,7 @@ import 'course_state.dart';
 import 'pages/home_page.dart';
 import 'pages/courses_page.dart';
 import 'pages/profile_page.dart';
+import 'providers/course_provider.dart';
 
 // I Komang Candra Aryadinata || 2415051085
 const String studentName = 'I Komang Candra Aryadinata';
@@ -12,8 +13,11 @@ const String studentId = '2415051085';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => CourseState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CourseState()),
+        ChangeNotifierProvider(create: (context) => CourseProvider()),
+      ],
       child: const CourseExplorerApp(),
     ),
   );
