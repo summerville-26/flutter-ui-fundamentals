@@ -257,7 +257,7 @@ class CoursesPage extends StatefulWidget {
 class _CoursesPageState extends State<CoursesPage> {
   String _searchQuery = '';
 
-  // Tahap 2: satu state favorit dimiliki parent dan diteruskan ke dua child.
+  // Tahap 3: parent menjadi single source of truth untuk status favorit.
   bool _demoFavorite = false;
 
   void _toggleDemoFavorite() {
@@ -305,7 +305,7 @@ class _CoursesPageState extends State<CoursesPage> {
               ),
               const SizedBox(height: 12),
 
-              // Tahap 2: parent meneruskan nilai dan callback ke dua child.
+              // Tahap 3: satu state di parent menjadi acuan untuk kedua child.
               Row(
                 children: [
                   Expanded(
@@ -316,10 +316,7 @@ class _CoursesPageState extends State<CoursesPage> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: FavoriteStatusChild(
-                      isFavorite: _demoFavorite,
-                      onToggle: _toggleDemoFavorite,
-                    ),
+                    child: FavoriteStatusChild(isFavorite: _demoFavorite),
                   ),
                 ],
               ),
@@ -372,7 +369,9 @@ class _CoursesPageState extends State<CoursesPage> {
 }
 
 // -----------------------------------------------------------------------------
-// TAHAP 2: Dua child menerima state dan callback dari parent (prop drilling).
+// TAHAP 3: Parent menyimpan satu state; child menerima data melalui constructor.
+// Hanya child kontrol yang mengirim aksi melalui callback. Child status hanya
+// menampilkan nilai dari parent sehingga tidak memiliki salinan state sendiri.
 // -----------------------------------------------------------------------------
 class FavoriteToggleChild extends StatelessWidget {
   final bool isFavorite;
@@ -408,13 +407,8 @@ class FavoriteToggleChild extends StatelessWidget {
 
 class FavoriteStatusChild extends StatelessWidget {
   final bool isFavorite;
-  final VoidCallback onToggle;
 
-  const FavoriteStatusChild({
-    super.key,
-    required this.isFavorite,
-    required this.onToggle,
-  });
+  const FavoriteStatusChild({super.key, required this.isFavorite});
 
   @override
   Widget build(BuildContext context) {
@@ -433,9 +427,9 @@ class FavoriteStatusChild extends StatelessWidget {
               isFavorite ? Icons.favorite : Icons.favorite_border,
               color: isFavorite ? Colors.red : Colors.grey,
             ),
-            TextButton(
-              onPressed: onToggle,
-              child: const Text('Ubah dari sini'),
+            const Text(
+              'Status mengikuti nilai dari parent.',
+              style: TextStyle(fontSize: 11),
             ),
           ],
         ),
