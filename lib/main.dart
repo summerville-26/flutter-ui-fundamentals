@@ -257,6 +257,15 @@ class CoursesPage extends StatefulWidget {
 class _CoursesPageState extends State<CoursesPage> {
   String _searchQuery = '';
 
+  // Tahap 2: satu state favorit dimiliki parent dan diteruskan ke dua child.
+  bool _demoFavorite = false;
+
+  void _toggleDemoFavorite() {
+    setState(() {
+      _demoFavorite = !_demoFavorite;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredCourses = dummyCourses
@@ -294,7 +303,28 @@ class _CoursesPageState extends State<CoursesPage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+
+              // Tahap 2: parent meneruskan nilai dan callback ke dua child.
+              Row(
+                children: [
+                  Expanded(
+                    child: FavoriteToggleChild(
+                      isFavorite: _demoFavorite,
+                      onToggle: _toggleDemoFavorite,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FavoriteStatusChild(
+                      isFavorite: _demoFavorite,
+                      onToggle: _toggleDemoFavorite,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
+
               // List / Grid Adaptif
               Expanded(
                 child: filteredCourses.isEmpty
@@ -337,6 +367,79 @@ class _CoursesPageState extends State<CoursesPage> {
           ),
         );
       },
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// TAHAP 2: Dua child menerima state dan callback dari parent (prop drilling).
+// -----------------------------------------------------------------------------
+class FavoriteToggleChild extends StatelessWidget {
+  final bool isFavorite;
+  final VoidCallback onToggle;
+
+  const FavoriteToggleChild({
+    super.key,
+    required this.isFavorite,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.blue.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Child 1: Kontrol Favorit',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            ),
+            Text(isFavorite ? 'Status: Favorit' : 'Status: Bukan favorit'),
+            TextButton(onPressed: onToggle, child: const Text('Ubah status')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FavoriteStatusChild extends StatelessWidget {
+  final bool isFavorite;
+  final VoidCallback onToggle;
+
+  const FavoriteStatusChild({
+    super.key,
+    required this.isFavorite,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.blue.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Child 2: Tampilan Status',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            ),
+            Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite ? Colors.red : Colors.grey,
+            ),
+            TextButton(
+              onPressed: onToggle,
+              child: const Text('Ubah dari sini'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -436,7 +539,6 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> {
-  // I Komang Candra Aryadinata || 2415051085
   // Tahap 1: local state untuk menampilkan/menyembunyikan deskripsi.
   bool _showDescription = true;
 
