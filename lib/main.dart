@@ -23,18 +23,6 @@ void main() {
   );
 }
 
-class ProviderDebugWidget extends StatelessWidget {
-  const ProviderDebugWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Sengaja salah: context ini berada di atas Provider.
-    final state = context.watch<CourseState>();
-
-    return Text('Jumlah favorit: ${state.favoriteCount}');
-  }
-}
-
 class CourseExplorerApp extends StatelessWidget {
   const CourseExplorerApp({super.key});
 
