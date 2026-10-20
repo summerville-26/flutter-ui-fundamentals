@@ -436,6 +436,10 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> {
+  // I Komang Candra Aryadinata || 2415051085
+  // Tahap 1: local state untuk menampilkan/menyembunyikan deskripsi.
+  bool _showDescription = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -454,10 +458,31 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
               'Kode: ${widget.course.code} | Status: ${widget.course.status}',
             ),
             const Divider(height: 32),
-            Text(
-              widget.course.description,
-              style: const TextStyle(fontSize: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Deskripsi Course',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _showDescription = !_showDescription;
+                    });
+                  },
+                  icon: Icon(
+                    _showDescription ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  label: Text(_showDescription ? 'Sembunyikan' : 'Tampilkan'),
+                ),
+              ],
             ),
+            if (_showDescription)
+              Text(
+                widget.course.description,
+                style: const TextStyle(fontSize: 16),
+              ),
             const SizedBox(height: 24),
             Row(
               children: [
