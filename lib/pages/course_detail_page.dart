@@ -20,6 +20,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Mengambil shared state dari Provider yang sama dengan CoursesPage
     final courseState = context.watch<CourseState>();
     final isFavorite = courseState.favorites.contains(widget.course.id);
 
@@ -36,9 +37,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Kode: ${widget.course.code} | Status: ${widget.course.status}',
+              'Kode: ${widget.course.code} | '
+              'Status: ${widget.course.status}',
             ),
             const Divider(height: 32),
+
+            // Deskripsi dapat ditampilkan atau disembunyikan
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -64,7 +68,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                 widget.course.description,
                 style: const TextStyle(fontSize: 16),
               ),
+
             const SizedBox(height: 24),
+
+            // Shared Favorites: status mengikuti Provider
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -86,7 +93,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
               icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
               label: Text(isFavorite ? 'Hapus Favorit' : 'Tambah Favorit'),
             ),
+
             const SizedBox(height: 30),
+
             const Text(
               'Pengembang: $studentName ($studentId)',
               style: TextStyle(color: Colors.grey, fontSize: 12),

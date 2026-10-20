@@ -75,6 +75,8 @@ class _CoursesPageState extends State<CoursesPage> {
                 ),
               ),
               const SizedBox(height: 12),
+
+              // Demo local state
               Row(
                 children: [
                   Expanded(
@@ -90,6 +92,8 @@ class _CoursesPageState extends State<CoursesPage> {
                 ],
               ),
               const SizedBox(height: 12),
+
+              // Tahap 4: ValueNotifier
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -125,13 +129,15 @@ class _CoursesPageState extends State<CoursesPage> {
                 ),
               ),
               const SizedBox(height: 12),
+
+              // Tahap 7 dan 13: Shared Favorites dengan Provider
               Card(
                 color: Colors.blue.shade50,
                 child: ListTile(
                   leading: const Icon(Icons.favorite, color: Colors.blue),
                   title: const Text('Tahap 7: Provider Favorites'),
                   subtitle: const Text(
-                    'Tekan ikon hati pada mata kuliah untuk mengubah status.',
+                    'Status favorit dibagikan ke halaman daftar dan detail.',
                   ),
                   trailing: Text(
                     '${courseState.favorites.length}',
@@ -144,6 +150,8 @@ class _CoursesPageState extends State<CoursesPage> {
                 ),
               ),
               const SizedBox(height: 8),
+
+              // Contoh Consumer
               Consumer<CourseState>(
                 builder: (context, state, child) {
                   return Card(
@@ -166,6 +174,8 @@ class _CoursesPageState extends State<CoursesPage> {
                 },
               ),
               const SizedBox(height: 12),
+
+              // Daftar mata kuliah
               Expanded(
                 child: filteredCourses.isEmpty
                     ? const Center(child: Text('Course tidak ditemukan'))
@@ -179,6 +189,8 @@ class _CoursesPageState extends State<CoursesPage> {
                         itemCount: filteredCourses.length,
                         itemBuilder: (context, index) {
                           final Course course = filteredCourses[index];
+
+                          // Membaca status favorit dari shared state
                           final isFavorite = courseState.favorites.contains(
                             course.id,
                           );
@@ -196,6 +208,7 @@ class _CoursesPageState extends State<CoursesPage> {
                               );
                             },
                             onFavoriteToggle: () {
+                              // Memperbarui state yang sama untuk semua screen
                               context.read<CourseState>().toggleFavorite(
                                 course.id,
                               );
