@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../data/course_data.dart';
 import '../main.dart';
+import '../providers/course_provider.dart';
 
 // I Komang Candra Aryadinata || 2415051085
 class HomePage extends StatelessWidget {
@@ -9,6 +10,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final courseProvider = context.watch<CourseProvider>();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -49,8 +52,22 @@ class HomePage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.class_, color: Colors.blue),
             title: const Text('Total Course Available'),
-            trailing: Text('${dummyCourses.length} Courses'),
+            trailing: courseProvider.isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text('${courseProvider.courses.length} Courses'),
           ),
+          if (courseProvider.errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Data course belum berhasil dimuat.',
+                style: TextStyle(color: Colors.red.shade700),
+              ),
+            ),
         ],
       ),
     );

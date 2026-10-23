@@ -20,9 +20,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Mengambil shared state dari Provider yang sama dengan CoursesPage
+    // Gunakan kode course sebagai kunci favorit.
     final courseState = context.watch<CourseState>();
-    final isFavorite = courseState.favorites.contains(widget.course.id);
+    final isFavorite = courseState.isFavorite(widget.course.code);
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.course.title)),
@@ -36,18 +36,16 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Kode: ${widget.course.code} | '
-              'Status: ${widget.course.status}',
-            ),
+            Text('Kode: ${widget.course.code}'),
+            Text('Status: ${widget.course.status}'),
             const Divider(height: 32),
 
-            // Deskripsi dapat ditampilkan atau disembunyikan
+            // Informasi diambil dari data course yang tersedia.
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Deskripsi Course',
+                  'Informasi Course',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 TextButton.icon(
@@ -63,22 +61,32 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                 ),
               ],
             ),
-            if (_showDescription)
+            if (_showDescription) ...[
               Text(
-                widget.course.description,
+                'Kode Mata Kuliah: ${widget.course.code}',
                 style: const TextStyle(fontSize: 16),
               ),
+              const SizedBox(height: 8),
+              Text(
+                'Jumlah SKS: ${widget.course.credits}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Status: ${widget.course.status}',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
 
             const SizedBox(height: 24),
 
-            // Shared Favorites: status mengikuti Provider
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
-                context.read<CourseState>().toggleFavorite(widget.course.id);
+                context.read<CourseState>().toggleFavorite(widget.course.code);
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -95,7 +103,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
             ),
 
             const SizedBox(height: 30),
-
             const Text(
               'Pengembang: $studentName ($studentId)',
               style: TextStyle(color: Colors.grey, fontSize: 12),

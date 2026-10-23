@@ -7,6 +7,7 @@ import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
 import '../widgets/favorite_widgets.dart';
 import 'course_detail_page.dart';
+import '../widgets/error_view.dart';
 
 // I Komang Candra Aryadinata || 2415051085
 class CoursesPage extends StatefulWidget {
@@ -165,12 +166,14 @@ class _CoursesPageState extends State<CoursesPage> {
     );
   }
 
+  //I Komang Candra Aryadinata || 2415051085
   Widget _buildCourseContent(
     CourseProvider provider,
     List<Course> courses,
     int crossAxisCount,
     CourseState courseState,
   ) {
+    // 1. Loading: tampilkan indikator saat data pertama kali dimuat.
     if (provider.isLoading && provider.courses.isEmpty) {
       return const Center(
         child: Column(
@@ -184,34 +187,25 @@ class _CoursesPageState extends State<CoursesPage> {
       );
     }
 
+    // 2. Error: tampilkan pesan dan tombol retry.
     if (provider.hasError && provider.courses.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 48),
-            const SizedBox(height: 8),
-            Text(
-              provider.errorMessage ?? 'Terjadi kesalahan.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.read<CourseProvider>().loadCourses();
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text('Coba Lagi'),
-            ),
-          ],
-        ),
+      return ErrorView(
+        message: provider.errorMessage ?? 'Terjadi kesalahan.',
+        onRetry: provider.loadCourses,
       );
     }
 
+    // 3. Success, tetapi API mengembalikan daftar kosong.
+    if (provider.courses.isEmpty) {
+      return const Center(child: Text('Data course belum tersedia'));
+    }
+
+    // 4. Pencarian tidak menemukan course.
     if (courses.isEmpty) {
       return const Center(child: Text('Course tidak ditemukan'));
     }
 
+    // 5. Success: tampilkan daftar course.
     return Column(
       children: [
         if (provider.isLoading)
@@ -227,7 +221,7 @@ class _CoursesPageState extends State<CoursesPage> {
             itemCount: courses.length,
             itemBuilder: (context, index) {
               final course = courses[index];
-              final isFavorite = courseState.favorites.contains(course.id);
+              final isFavorite = courseState.favorites.contains(course.code);
 
               return CourseCard(
                 course: course,
@@ -241,7 +235,7 @@ class _CoursesPageState extends State<CoursesPage> {
                   );
                 },
                 onFavoriteToggle: () {
-                  context.read<CourseState>().toggleFavorite(course.id);
+                  context.read<CourseState>().toggleFavorite(course.code);
                 },
               );
             },
