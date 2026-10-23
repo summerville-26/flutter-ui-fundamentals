@@ -1,14 +1,12 @@
 import '../models/course.dart';
-import '../services/course_service.dart';
+import '../services/course_api_service.dart';
 
-// I Komang Candra Aryadinata || 2415051085
 class CourseRepository {
-  final CourseService courseService;
+  CourseRepository(this._apiService);
 
-  CourseRepository({CourseService? courseService})
-    : courseService = courseService ?? CourseService();
+  final CourseApiService _apiService;
 
-  Future<List<Course>> getCourses() async {
-    return await courseService.fetchCourses();
+  Future<List<Course>> getCourses() {
+    return _apiService.getCourses();
   }
 }
