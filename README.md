@@ -1,42 +1,92 @@
-## Architecture dan Dependency Direction
+Tahap 1 — Membaca REST Endpoint dan JSON
 
-Course Explorer v2 menggunakan pemisahan tanggung jawab untuk
-mempermudah pemeliharaan dan pengembangan aplikasi.
+1. Informasi REST API
 
-### Struktur dan Tanggung Jawab Folder
+Nama API: Course API - Pertemuan 7
 
-- `models/`: Mendefinisikan struktur data, termasuk model Course,
-  serta proses konversi data melalui fromJson dan toJson.
-- `services/`: Menangani pengambilan data dari sumber data.
-- `repositories/`: Menjadi perantara antara provider dan service.
-- `providers/`: Mengelola state asinkron, data mata kuliah,
-  loading, dan error.
-- `pages/`: Menyediakan halaman aplikasi, seperti Home, Courses,
-  Course Detail, dan Profile.
-- `widgets/`: Menyimpan komponen antarmuka yang dapat digunakan
-  kembali.
-- `data/`: Menyimpan data mata kuliah simulasi yang digunakan
-  sebagai sumber data.
-- `course_state.dart`: Mengelola shared state favorit menggunakan
-  ChangeNotifier.
-- `main.dart`: Menjadi titik masuk aplikasi serta mengatur provider,
-  tema, dan navigasi utama.
+Base URL: https://course-api-pearl.vercel.app
 
-### Arah Dependency
+Endpoint: /courses
 
-Screen/Widget -> Provider -> Repository -> Service/Data Source
+URL lengkap: https://course-api-pearl.vercel.app/courses
 
-UI tidak mengakses sumber data secara langsung. Provider mengelola
-state, repository mengatur akses data, dan service menangani
-pengambilan data.
+Metode HTTP: GET
 
-### Shared State
+Tujuan: Mengambil daftar mata kuliah dari REST API.
 
-CourseState menyediakan status favorit yang digunakan bersama
-oleh halaman daftar mata kuliah dan halaman detail. Perubahan
-state diberitahukan melalui notifyListeners().
+Format respons: JSON.
 
-### Responsive Layout
+2. Struktur JSON
 
-Aplikasi mempertahankan navigasi responsif untuk menyesuaikan
-tampilan dengan ukuran layar.
+Field utama setiap objek Course:
+
+id: identitas mata kuliah.
+
+code: kode mata kuliah.
+
+title: nama mata kuliah.
+
+credits: jumlah kredit.
+
+status: status mata kuliah.
+
+create_at: waktu pembuatan
+
+3. Hasil Pengujian
+
+Status HTTP: 200 OK
+
+Bentuk respons: [
+{
+"id": 1,
+"code": "MOB01",
+"title": "Git & GitHub",
+"credits": 2,
+"status": "active",
+"created_at": "2026-10-21T03:28:08.91197Z"
+},
+{
+"id": 2,
+"code": "MOB02",
+"title": "Dart Fundamentals",
+"credits": 3,
+"status": "active",
+"created_at": "2026-10-21T03:28:09.128977Z"
+},
+{
+"id": 3,
+"code": "MOB03",
+"title": "Flutter Widgets & Layout",
+"credits": 3,
+"status": "planned",
+"created_at": "2026-10-21T03:28:09.361747Z"
+},
+{
+"id": 4,
+"code": "MOB04",
+"title": "State Management Provider",
+"credits": 2,
+"status": "planned",
+"created_at": "2026-10-21T03:28:09.576271Z"
+},
+{
+"id": 5,
+"code": "MOB05",
+"title": "REST API & Database",
+"credits": 3,
+"status": "done",
+"created_at": "2026-10-21T03:28:09.790592Z"
+},
+{
+"id": 10,
+"code": "juven01",
+"title": "pembelajaran AI",
+"credits": 3,
+"status": "active",
+"created_at": "2026-10-22T14:51:36.501933Z"
+}
+]
+
+Jumlah data yang diterima: 6 mata kuliah
+
+Kesimpulan: Endpoint GET /courses digunakan untuk mengambil data mata kuliah yang selanjutnya akan diproses dan ditampilkan oleh aplikasi Flutter.
