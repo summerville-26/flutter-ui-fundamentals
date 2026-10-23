@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/course.dart';
+
 // Identitas Mahasiswa
 const String studentName = 'I Komang Candra Aryadinata';
 const String studentId = '2415051085';
@@ -10,17 +12,23 @@ const String studentId = '2415051085';
 // Endpoint REST API dari dosen
 const String apiUrl = 'https://course-api-pearl.vercel.app/courses';
 
-Future<List<dynamic>> fetchCourses() async {
+// Mengambil data endpoint dan mengubah JSON menjadi List<Course>.
+Future<List<Course>> fetchCourses() async {
   final response = await http.get(Uri.parse(apiUrl));
 
   debugPrint('HTTP Status: ${response.statusCode}');
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final dynamic data = jsonDecode(response.body);
 
     if (data is List) {
-      debugPrint('Jumlah data diterima: ${data.length}');
-      return data;
+      final courses = data.map((item) {
+        return Course.fromJson(Map<String, dynamic>.from(item as Map));
+      }).toList();
+
+      debugPrint('Jumlah data diterima: ${courses.length}');
+
+      return courses;
     }
 
     throw Exception('Format respons bukan array JSON.');
@@ -58,7 +66,7 @@ class ApiGetTestPage extends StatefulWidget {
 }
 
 class _ApiGetTestPageState extends State<ApiGetTestPage> {
-  late Future<List<dynamic>> coursesFuture;
+  late Future<List<Course>> coursesFuture;
 
   @override
   void initState() {
@@ -100,7 +108,7 @@ class _ApiGetTestPageState extends State<ApiGetTestPage> {
             const SelectableText(apiUrl),
             const SizedBox(height: 20),
             Expanded(
-              child: FutureBuilder<List<dynamic>>(
+              child: FutureBuilder<List<Course>>(
                 future: coursesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -132,7 +140,11 @@ class _ApiGetTestPageState extends State<ApiGetTestPage> {
                     );
                   }
 
-                  final courses = snapshot.data ?? [];
+                  final List<Course> courses = snapshot.data ?? [];
+
+                  if (courses.isEmpty) {
+                    return const Center(child: Text('Belum ada data course.'));
+                  }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,12 +176,13 @@ class _ApiGetTestPageState extends State<ApiGetTestPage> {
                             return Card(
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  child: Text('${course['id']}'),
+                                  child: Text('${course.id ?? '-'}'),
                                 ),
-                                title: Text('${course['title']}'),
+                                title: Text(course.title),
                                 subtitle: Text(
-                                  'Kode: ${course['code']}'
-                                  '\nStatus: ${course['status']}',
+                                  'Kode: ${course.code}'
+                                  '\nSKS: ${course.credits}'
+                                  '\nStatus: ${course.status}',
                                 ),
                               ),
                             );

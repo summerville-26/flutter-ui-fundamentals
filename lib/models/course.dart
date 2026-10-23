@@ -1,38 +1,35 @@
-// I Komang Candra Aryadinata || 2415051085
+//I Komang Camdra Aryadinata || 2415051085
 class Course {
-  final String id;
-  final String title;
+  final int? id;
   final String code;
+  final String title;
+  final int credits;
   final String status;
-  final String description;
+  final String? createdAt;
 
-  Course({
-    required this.id,
-    required this.title,
+  const Course({
+    this.id,
     required this.code,
-    required this.status,
-    required this.description,
+    required this.title,
+    required this.credits,
+    this.status = 'planned',
+    this.createdAt,
   });
 
   // Mengubah JSON menjadi objek Course.
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
-      id: json['id'].toString(),
-      title: json['title'] as String,
+      id: json['id'] == null ? null : (json['id'] as num).toInt(),
       code: json['code'] as String,
-      status: json['status'] as String,
-      description: json['description'] as String,
+      title: json['title'] as String,
+      credits: (json['credits'] as num).toInt(),
+      status: (json['status'] as String?) ?? 'planned',
+      createdAt: json['created_at'] as String?,
     );
   }
 
   // Mengubah objek Course menjadi JSON.
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'code': code,
-      'status': status,
-      'description': description,
-    };
+    return {'code': code, 'title': title, 'credits': credits, 'status': status};
   }
 }
