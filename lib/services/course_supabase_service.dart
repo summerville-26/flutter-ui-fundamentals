@@ -28,10 +28,16 @@ class CourseSupabaseService implements CourseDataSource {
     return courses;
   }
 
-  // Akan diimplementasikan pada Tahap 13.
+  // I Komang Candra Aryadinata || 2415051085
   @override
-  Future<Course> createCourse(Course course) {
-    throw UnimplementedError('Create course akan dibuat pada Tahap 13.');
+  Future<Course> createCourse(Course course) async {
+    final row = await supabase
+        .from('courses')
+        .insert(course.toJson())
+        .select()
+        .single();
+
+    return Course.fromJson(Map<String, dynamic>.from(row));
   }
 
   // Akan diimplementasikan pada Tahap 14.
