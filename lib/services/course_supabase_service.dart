@@ -40,10 +40,11 @@ class CourseSupabaseService implements CourseDataSource {
     return Course.fromJson(Map<String, dynamic>.from(row));
   }
 
-  // Akan diimplementasikan pada Tahap 14.
+  // I Komang Candra Aryadinata || 2415051085
+
   @override
-  Future<void> updateCourse(int id, Course course) {
-    throw UnimplementedError('Update course akan dibuat pada Tahap 14.');
+  Future<void> updateCourse(int id, Course course) async {
+    await supabase.from('courses').update(course.toJson()).eq('id', id);
   }
 
   // Akan diimplementasikan pada Tahap 15.
