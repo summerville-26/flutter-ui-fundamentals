@@ -10,12 +10,24 @@ import 'repositories/course_repository.dart';
 import 'services/course_api_service.dart';
 import 'services/course_data_source.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'config/supabase_config.dart';
+
 const String studentName = 'I Komang Candra Aryadinata';
 const String studentId = '2415051085';
 
 const String apiBaseUrl = 'https://course-api-pearl.vercel.app';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: SupabaseConfig.supabaseUrl,
+    publishableKey: SupabaseConfig.supabaseAnonKey,
+  );
+  // Pertahankan pembuatan CourseRepository,
+  // MultiProvider, dan CourseExplorerApp yang sudah ada.
   final CourseDataSource dataSource = CourseApiService(apiBaseUrl);
 
   final CourseRepository repository = CourseRepository(dataSource);
