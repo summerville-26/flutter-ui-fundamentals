@@ -2,13 +2,12 @@ import 'package:flutter/foundation.dart';
 
 import '../models/course.dart';
 import '../repositories/course_repository.dart';
-import '../services/course_api_service.dart';
+import '../services/course_supabase_service.dart';
 
+// I Komang Candra Aryadinata || 2415051085
 class CourseProvider extends ChangeNotifier {
-  CourseProvider({
-    CourseRepository? repository,
-    String baseUrl = 'https://course-api-pearl.vercel.app',
-  }) : repository = repository ?? CourseRepository(CourseApiService(baseUrl));
+  CourseProvider({CourseRepository? repository})
+    : repository = repository ?? CourseRepository(CourseSupabaseService());
 
   final CourseRepository repository;
 
@@ -30,7 +29,10 @@ class CourseProvider extends ChangeNotifier {
 
     try {
       _courses = await repository.getCourses();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('Gagal memuat courses: $error');
+      debugPrintStack(stackTrace: stackTrace);
+
       _errorMessage = 'Gagal memuat data mata kuliah: $error';
     } finally {
       _isLoading = false;

@@ -7,12 +7,11 @@ import 'pages/courses_page.dart';
 import 'pages/profile_page.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
-import 'services/course_api_service.dart';
-import 'services/course_data_source.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config/supabase_config.dart';
+import 'services/course_supabase_service.dart';
 
 const String studentName = 'I Komang Candra Aryadinata';
 const String studentId = '2415051085';
@@ -28,9 +27,8 @@ Future<void> main() async {
   );
   // Pertahankan pembuatan CourseRepository,
   // MultiProvider, dan CourseExplorerApp yang sudah ada.
-  final CourseDataSource dataSource = CourseApiService(apiBaseUrl);
 
-  final CourseRepository repository = CourseRepository(dataSource);
+  final repository = CourseRepository(CourseSupabaseService());
 
   runApp(
     MultiProvider(

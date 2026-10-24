@@ -24,17 +24,6 @@ class _CoursesPageState extends State<CoursesPage> {
 
   final ValueNotifier<int> _favoriteCounter = ValueNotifier<int>(0);
 
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<CourseProvider>().loadCourses();
-      }
-    });
-  }
-
   void _toggleDemoFavorite() {
     setState(() {
       _demoFavorite = !_demoFavorite;
