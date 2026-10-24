@@ -59,4 +59,16 @@ class CourseApiService {
       );
     }
   }
+
+  //I Komang Candra Aryadinata || 2415051085
+  Future<void> deleteCourse(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/courses/$id'));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        'Gagal menghapus course. '
+        'Status code: ${response.statusCode}',
+      );
+    }
+  }
 }
