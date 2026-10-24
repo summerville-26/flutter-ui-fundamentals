@@ -4,7 +4,6 @@ import '../models/course.dart';
 import '../repositories/course_repository.dart';
 import '../services/course_api_service.dart';
 
-// I Komang Candra Aryadinata || 2415051085
 class CourseProvider extends ChangeNotifier {
   CourseProvider({
     CourseRepository? repository,
