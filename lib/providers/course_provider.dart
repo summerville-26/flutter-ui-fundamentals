@@ -16,7 +16,9 @@ class CourseProvider extends ChangeNotifier {
   List<Course> _courses = [];
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isSaving = false;
 
+  bool get isSaving => _isSaving;
   List<Course> get courses => List.unmodifiable(_courses);
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -33,6 +35,18 @@ class CourseProvider extends ChangeNotifier {
       _errorMessage = 'Gagal memuat data mata kuliah: $error';
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Course> createCourse(Course course) async {
+    _isSaving = true;
+    notifyListeners();
+
+    try {
+      return await repository.createCourse(course);
+    } finally {
+      _isSaving = false;
       notifyListeners();
     }
   }

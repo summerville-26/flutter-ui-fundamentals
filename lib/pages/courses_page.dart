@@ -8,6 +8,7 @@ import '../widgets/course_card.dart';
 import '../widgets/favorite_widgets.dart';
 import 'course_detail_page.dart';
 import '../widgets/error_view.dart';
+import 'add_course_page.dart';
 
 // I Komang Candra Aryadinata || 2415051085
 class CoursesPage extends StatefulWidget {
@@ -72,20 +73,54 @@ class _CoursesPageState extends State<CoursesPage> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              TextField(
-                onChanged: (value) {
-                  setState(() => _searchQuery = value);
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search courses...',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.blue.withValues(alpha: 0.1),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      onChanged: (value) {
+                        setState(() => _searchQuery = value);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search courses...',
+                        prefixIcon: const Icon(Icons.search),
+                        filled: true,
+                        fillColor: Colors.blue.withValues(alpha: 0.1),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  IconButton.filled(
+                    tooltip: 'Tambah Course',
+                    onPressed: () async {
+                      // Ambil provider sebelum proses await.
+                      final courseProvider = context.read<CourseProvider>();
+
+                      final result = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AddCoursePage(),
+                        ),
+                      );
+
+                      // Pastikan halaman masih aktif.
+                      if (!mounted) return;
+
+                      // Muat ulang daftar jika course berhasil ditambahkan.
+                      if (result == true) {
+                        await courseProvider.loadCourses();
+                      }
+                    },
+                    icon: const Icon(Icons.add),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
 
