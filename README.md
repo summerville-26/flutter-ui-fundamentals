@@ -1,92 +1,125 @@
-Tahap 1 — Membaca REST Endpoint dan JSON
+# Course Explorer v2
 
-1. Informasi REST API
+## 1. Deskripsi Aplikasi
 
-Nama API: Course API - Pertemuan 7
+Course Explorer v2 adalah aplikasi berbasis Flutter yang digunakan untuk mengelola dan menampilkan data mata kuliah. Aplikasi ini dikembangkan sebagai proyek praktikum untuk menerapkan konsep pengembangan antarmuka, responsive layout, navigasi, state management, serta integrasi backend.
 
-Base URL: https://course-api-pearl.vercel.app
+Aplikasi menyediakan fitur untuk melihat daftar mata kuliah, mencari mata kuliah berdasarkan kode atau judul, melihat detail mata kuliah, menambahkan data baru, mengubah data, dan menghapus data. Aplikasi juga menyediakan fitur favorites untuk menandai mata kuliah pilihan.
 
-Endpoint: /courses
+Antarmuka dirancang agar dapat menyesuaikan ukuran layar, baik pada perangkat berukuran kecil maupun besar.
 
-URL lengkap: https://course-api-pearl.vercel.app/courses
+## 2. Teknologi yang Digunakan
 
-Metode HTTP: GET
+- **Flutter** — framework pengembangan aplikasi.
+- **Dart** — bahasa pemrograman.
+- **Provider** — pengelolaan shared state dan state aplikasi.
+- **Supabase** — backend untuk penyimpanan dan pengelolaan data mata kuliah.
+- **PostgreSQL** — basis data yang digunakan oleh Supabase.
+- **Git dan GitHub** — version control dan penyimpanan repository proyek.
 
-Tujuan: Mengambil daftar mata kuliah dari REST API.
+## 3. Fitur Aplikasi
 
-Format respons: JSON.
+- Menampilkan daftar mata kuliah.
+- Mencari mata kuliah berdasarkan kode atau judul.
+- Menampilkan detail mata kuliah.
+- Menambahkan mata kuliah.
+- Mengubah data mata kuliah.
+- Menghapus mata kuliah.
+- Menandai mata kuliah sebagai favorites.
+- Menampilkan status loading, kondisi data kosong, dan pesan error.
+- Menyediakan antarmuka responsif untuk berbagai ukuran layar.
+- Mengelola data melalui backend Supabase.
 
-2. Struktur JSON
+## 4. Cara Menjalankan Aplikasi
 
-Field utama setiap objek Course:
+### Persyaratan
 
-id: identitas mata kuliah.
+Pastikan perangkat telah memiliki:
 
-code: kode mata kuliah.
+- Flutter SDK.
+- Dart SDK yang sesuai dengan Flutter.
+- Visual Studio Code atau editor lain yang mendukung Flutter.
+- Emulator atau perangkat untuk menjalankan aplikasi.
+- Koneksi internet untuk mengakses backend Supabase.
 
-title: nama mata kuliah.
+### Langkah menjalankan
 
-credits: jumlah kredit.
+1. Clone repository proyek:
 
-status: status mata kuliah.
+   ```bash
+   git clone https://github.com/summerville-26/flutter-ui-fundamentals.git
+   ```
 
-create_at: waktu pembuatan
+2. Masuk ke direktori proyek:
 
-3. Hasil Pengujian
+   ```bash
+   cd flutter-ui-fundamentals
+   ```
 
-Status HTTP: 200 OK
+3. Unduh dependensi:
 
-Bentuk respons: [
-{
-"id": 1,
-"code": "MOB01",
-"title": "Git & GitHub",
-"credits": 2,
-"status": "active",
-"created_at": "2026-10-21T03:28:08.91197Z"
-},
-{
-"id": 2,
-"code": "MOB02",
-"title": "Dart Fundamentals",
-"credits": 3,
-"status": "active",
-"created_at": "2026-10-21T03:28:09.128977Z"
-},
-{
-"id": 3,
-"code": "MOB03",
-"title": "Flutter Widgets & Layout",
-"credits": 3,
-"status": "planned",
-"created_at": "2026-10-21T03:28:09.361747Z"
-},
-{
-"id": 4,
-"code": "MOB04",
-"title": "State Management Provider",
-"credits": 2,
-"status": "planned",
-"created_at": "2026-10-21T03:28:09.576271Z"
-},
-{
-"id": 5,
-"code": "MOB05",
-"title": "REST API & Database",
-"credits": 3,
-"status": "done",
-"created_at": "2026-10-21T03:28:09.790592Z"
-},
-{
-"id": 10,
-"code": "juven01",
-"title": "pembelajaran AI",
-"credits": 3,
-"status": "active",
-"created_at": "2026-10-22T14:51:36.501933Z"
-}
-]
+   ```bash
+   flutter pub get
+   ```
 
-Jumlah data yang diterima: 6 mata kuliah
+4. Pastikan konfigurasi Supabase tersedia dan sesuai dengan proyek:
 
-Kesimpulan: Endpoint GET /courses digunakan untuk mengambil data mata kuliah yang selanjutnya akan diproses dan ditampilkan oleh aplikasi Flutter.
+   ```text
+   lib/config/supabase_config.dart
+   ```
+
+   Gunakan Supabase URL dan publishable/anon key yang sesuai. Jangan memasukkan `service_role` key atau secret server ke aplikasi Flutter.
+
+5. Jalankan aplikasi:
+
+   ```bash
+   flutter run
+   ```
+
+## 5. Arsitektur Singkat
+
+Aplikasi menggunakan pemisahan tanggung jawab agar pengelolaan data dan antarmuka lebih terstruktur.
+
+- **Models** — mendefinisikan struktur data mata kuliah melalui model `Course`.
+- **Services** — menangani komunikasi dengan backend Supabase melalui `CourseSupabaseService`.
+- **Data Source** — mendefinisikan operasi akses data melalui `CourseDataSource`.
+- **Repositories** — menyediakan perantara antara provider dan sumber data melalui `CourseRepository`.
+- **Providers** — mengelola data mata kuliah, status loading, pesan error, dan operasi CRUD melalui `CourseProvider`.
+- **State Management** — mengelola shared state favorites melalui `CourseState`.
+- **Pages** — menyediakan halaman utama, daftar mata kuliah, detail, tambah, edit, dan profil.
+- **Widgets** — menyediakan komponen antarmuka yang dapat digunakan kembali.
+
+Alur pengelolaan data:
+
+`Pages/Widgets → Provider → Repository → Service → Supabase`
+
+Data hasil permintaan dikembalikan melalui lapisan yang sama untuk ditampilkan pada antarmuka.
+
+## 6. Backend yang Digunakan
+
+Backend aplikasi menggunakan Supabase dengan basis data PostgreSQL. Data mata kuliah disimpan dalam tabel `courses`.
+
+Operasi yang didukung meliputi:
+
+- **Create** — menambahkan mata kuliah.
+- **Read** — mengambil dan menampilkan daftar mata kuliah.
+- **Update** — memperbarui data mata kuliah.
+- **Delete** — menghapus mata kuliah.
+
+Akses database diatur melalui Row Level Security (RLS) dan policy Supabase. Pada konfigurasi praktikum saat ini, role `anon` diizinkan menjalankan operasi CRUD pada tabel `courses`. Konfigurasi ini digunakan untuk kebutuhan demonstrasi tanpa autentikasi dan tidak disarankan untuk aplikasi produksi karena akses data belum dibatasi berdasarkan identitas pengguna.
+
+## 7. Pengujian dan Pemeriksaan
+
+Pemeriksaan kode dapat dilakukan menggunakan perintah:
+
+```bash
+flutter analyze
+```
+
+Pengujian otomatis dapat dijalankan menggunakan:
+
+```bash
+flutter test
+```
+
+Hasil pemeriksaan perlu dievaluasi untuk memastikan tidak terdapat error yang belum dit
