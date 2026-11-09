@@ -330,76 +330,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // SECURITY TEST: Menguji perlindungan RLS
-  Future<void> _securityTest() async {
-    const kosIdUserA = 'a1bb852e-494e-4a65-8974-176f99a81113';
-    const ownerIdUserA = '53152417-480f-4a8c-a4bb-96e1da89971e';
-
-    final results = <String>[];
-
-    // 1. User B mencoba mengubah data milik User A
-    try {
-      final updated = await _kosService.update(kosIdUserA, {
-        'name': 'DIUBAH USER B',
-      });
-
-      results.add(
-        updated
-            ? '[FAIL] User B berhasil mengubah data User A'
-            : '[PASS] UPDATE ditolak oleh RLS',
-      );
-    } catch (e) {
-      results.add('[PASS] UPDATE ditolak: $e');
-    }
-
-    // 2. User B mencoba menghapus data milik User A
-    try {
-      final deleted = await _kosService.delete(kosIdUserA);
-
-      results.add(
-        deleted
-            ? '[FAIL] User B berhasil menghapus data User A'
-            : '[PASS] DELETE ditolak oleh RLS',
-      );
-    } catch (e) {
-      results.add('[PASS] DELETE ditolak: $e');
-    }
-
-    // 3. User B mencoba menambahkan kos atas nama User A
-    try {
-      await Supabase.instance.client.from('kos').insert({
-        'owner_id': ownerIdUserA,
-        'name': 'Kos Palsu',
-        'address': 'Percobaan User B',
-        'price': 500000,
-      });
-
-      results.add('[FAIL] INSERT atas nama User A berhasil');
-    } on PostgrestException catch (e) {
-      results.add('[PASS] INSERT ditolak: ${e.code} - ${e.message}');
-    } catch (e) {
-      results.add('[ERROR] INSERT: $e');
-    }
-
-    if (!mounted) return;
-
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hasil Security Testing'),
-        content: SingleChildScrollView(child: Text(results.join('\n\n'))),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Tutup'),
-          ),
-        ],
-      ),
-    );
-
-    _refreshKos();
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<UserProfile?>(
@@ -434,11 +364,6 @@ class _HomePageState extends State<HomePage> {
                 tooltip: 'Logout',
                 icon: const Icon(Icons.logout),
                 onPressed: _logout,
-              ),
-              IconButton(
-                tooltip: 'Security Test',
-                icon: const Icon(Icons.security),
-                onPressed: _securityTest,
               ),
             ],
           ),
