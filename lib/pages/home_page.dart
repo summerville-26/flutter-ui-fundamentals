@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
+import '../widgets/role_guard.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -40,87 +41,108 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _buildProfile(UserProfile profile) {
-    return Card(
-      margin: const EdgeInsets.all(20),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.account_circle, size: 80, color: Colors.indigo),
-            const SizedBox(height: 16),
-            const Text(
-              'Informasi Pengguna',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            _buildInfo('Nama', profile.name.isEmpty ? '-' : profile.name),
-            _buildInfo('Email', profile.email),
-            _buildInfo('Role', profile.role.toUpperCase()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfo(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 75,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          const Text(': '),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('KosFinder'),
-        actions: [
-          IconButton(
-            tooltip: 'Logout',
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+    return FutureBuilder<UserProfile?>(
+      future: _profileFuture,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final p = snap.data;
+
+        if (snap.hasError || p == null) {
+          return const Scaffold(
+            body: Center(child: Text('Gagal memuat profil')),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('KosFinder (${p.role})'),
+            actions: [
+              IconButton(
+                tooltip: 'Logout',
+                icon: const Icon(Icons.logout),
+                onPressed: _logout,
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Center(
-        child: FutureBuilder<UserProfile?>(
-          future: _profileFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
 
-            if (snapshot.hasError) {
-              return Text(
-                'Gagal mengambil profil: ${snapshot.error}',
-                textAlign: TextAlign.center,
-              );
-            }
+          body: ListView(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: Text(p.name.isEmpty ? p.email : p.name),
+                subtitle: Text('${p.email} • ${p.role}'),
+              ),
 
-            final profile = snapshot.data;
+              const Divider(),
 
-            if (profile == null) {
-              return const Text('Data profil pengguna tidak ditemukan.');
-            }
+              const ListTile(
+                leading: Icon(Icons.list),
+                title: Text('Daftar Kos'),
+                subtitle: Text('Melihat daftar kos yang tersedia'),
+              ),
 
-            return _buildProfile(profile);
-          },
-        ),
-      ),
+              const ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text('Detail Kos'),
+                subtitle: Text('Melihat informasi detail kos'),
+              ),
+
+              if (p.isOwner || p.isAdmin) ...[
+                const Divider(),
+
+                const ListTile(
+                  leading: Icon(Icons.home_work),
+                  title: Text('My Kos'),
+                  subtitle: Text('Mengelola daftar kos milik Anda'),
+                ),
+
+                const ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Edit Kos'),
+                  subtitle: Text('Mengubah informasi kos'),
+                ),
+
+                const ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text('Delete Kos'),
+                  subtitle: Text('Menghapus data kos'),
+                ),
+              ],
+
+              if (p.isAdmin) ...[
+                const Divider(),
+
+                const ListTile(
+                  leading: Icon(Icons.admin_panel_settings),
+                  title: Text('Kelola Data (Admin)'),
+                  subtitle: Text('Pengelolaan data aplikasi'),
+                ),
+              ],
+            ],
+          ),
+
+          floatingActionButton: RoleGuard(
+            role: p.role,
+            allowed: const ['owner', 'admin'],
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Fitur Add Kos belum dibuat.')),
+                );
+              },
+              icon: const Icon(Icons.add_home),
+              label: const Text('Tambah Kos'),
+            ),
+          ),
+        );
+      },
     );
   }
 }
