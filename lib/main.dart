@@ -21,8 +21,8 @@ Future<void> main() async {
 
   // Inisialisasi Supabase.
   await Supabase.initialize(
-    url: 'GUNAKAN_URL_SUPABASE_MILIKMU',
-    publishableKey: 'GUNAKAN_PUBLISHABLE_KEY_MILIKMU',
+    url: 'https://vgwwtvjklfhfhtbxdyfb.supabase.co',
+    publishableKey: 'sb_publishable_ThTmHQOYDjFablC1HMsbmQ_pQSOP0s8',
   );
 
   runApp(const KosFinderApp());
