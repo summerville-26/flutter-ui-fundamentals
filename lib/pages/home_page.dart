@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import '../services/kos_service.dart';
+import '../services/notification_service.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,18 +24,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     _profileFuture = _profileService.getMyProfile();
     _kosFuture = _kosService.fetchAll();
+
+    // Inisialisasi layanan notifikasi.
+    NotificationService.instance.init();
   }
 
-  // Memuat ulang daftar kos
+  // Memuat ulang daftar kos.
   void _refreshKos() {
     setState(() {
       _kosFuture = _kosService.fetchAll();
     });
   }
 
-  // Logout
+  // Logout.
   Future<void> _logout() async {
     try {
       await AuthService.instance.logout();
@@ -53,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // CREATE: Menambahkan kos
+  // CREATE: Menambahkan kos.
   Future<void> _addKos() async {
     final nameController = TextEditingController();
     final addressController = TextEditingController();
@@ -157,7 +162,7 @@ class _HomePageState extends State<HomePage> {
     priceController.dispose();
   }
 
-  // UPDATE: Mengubah data kos
+  // UPDATE: Mengubah data kos.
   Future<void> _editKos(Map<String, dynamic> kos) async {
     final nameController = TextEditingController(
       text: kos['name']?.toString() ?? '',
@@ -270,7 +275,7 @@ class _HomePageState extends State<HomePage> {
     priceController.dispose();
   }
 
-  // DELETE: Menghapus data kos
+  // DELETE: Menghapus data kos.
   Future<void> _deleteKos(Map<String, dynamic> kos) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -367,11 +372,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Profil pengguna
+              // Profil pengguna.
               ListTile(
                 leading: const Icon(Icons.person),
                 title: Text(p.name.isEmpty ? p.email : p.name),
@@ -387,7 +391,7 @@ class _HomePageState extends State<HomePage> {
 
               const SizedBox(height: 12),
 
-              // READ: Menampilkan data kos
+              // READ: Menampilkan data kos.
               FutureBuilder<List<Map<String, dynamic>>>(
                 future: _kosFuture,
                 builder: (context, kosSnap) {
@@ -429,9 +433,7 @@ class _HomePageState extends State<HomePage> {
                           leading: const CircleAvatar(
                             child: Icon(Icons.home_work),
                           ),
-
                           title: Text(kos['name']?.toString() ?? 'Tanpa nama'),
-
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -450,10 +452,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-
                           isThreeLine: true,
 
-                          // Edit dan Hapus hanya untuk pemilik data
+                          // Edit dan hapus hanya untuk pemilik.
                           trailing: isMine
                               ? PopupMenuButton<String>(
                                   tooltip: 'Kelola Kos',
@@ -498,7 +499,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          // Tombol tambah hanya untuk Owner dan Admin
+          // Tombol tambah hanya untuk Owner dan Admin.
           floatingActionButton: (p.isOwner || p.isAdmin)
               ? FloatingActionButton.extended(
                   onPressed: _addKos,

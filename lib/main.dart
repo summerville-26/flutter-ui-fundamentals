@@ -8,14 +8,7 @@ import 'app_keys.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'services/auth_service.dart';
-
-// Handler untuk notifikasi ketika aplikasi berada di background.
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  debugPrint('Notifikasi background: ${message.messageId}');
-}
+import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,25 +16,14 @@ Future<void> main() async {
   // Inisialisasi Firebase.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Mendaftarkan background handler FCM.
+  // Mendaftarkan background handler dari notification_service.dart.
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Inisialisasi Supabase.
   await Supabase.initialize(
-    url: 'https://vgwwtvjklfhfhtbxdyfb.supabase.co',
-    publishableKey: 'sb_publishable_ThTmHQOYDjFablC1HMsbmQ_pQSOP0s8',
+    url: 'GUNAKAN_URL_SUPABASE_MILIKMU',
+    publishableKey: 'GUNAKAN_PUBLISHABLE_KEY_MILIKMU',
   );
-
-  // Meminta izin notifikasi.
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  // Mengambil token perangkat.
-  final token = await FirebaseMessaging.instance.getToken();
-  debugPrint('FCM Token: $token');
 
   runApp(const KosFinderApp());
 }
