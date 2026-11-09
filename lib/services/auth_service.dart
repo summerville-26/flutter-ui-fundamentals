@@ -10,13 +10,6 @@ class AuthService {
   Session? get currentSession => _client.auth.currentSession;
   bool get isLoggedIn => currentSession != null;
 
-  Future<AuthResponse> register({
-    required String email,
-    required String password,
-  }) {
-    return _client.auth.signUp(email: email, password: password);
-  }
-
   Future<AuthResponse> login({
     required String email,
     required String password,
@@ -25,4 +18,17 @@ class AuthService {
   }
 
   Future<void> logout() => _client.auth.signOut();
+
+  Future<AuthResponse> register({
+    required String email,
+    required String password,
+    String name = '',
+    String role = 'seeker',
+  }) {
+    return _client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'name': name, 'role': role},
+    );
+  }
 }
